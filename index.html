@@ -441,9 +441,9 @@ const audioPlayer = document.getElementById('audio-player');
 function playAudio(audioName) {
     audioPlayer.pause();
     audioPlayer.currentTime = 0;
-    audioPlayer.src = `audio/${audioName}.mp3`;
+    audioPlayer.src = `${audioName}.mp3`;
     audioPlayer.play().catch(error => {
-        console.log(`Аудиофайл не найден: audio/${audioName}.mp3`);
+        console.log(`Аудиофайл не найден: ${audioName}.mp3`);
     });
 }
 
