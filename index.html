@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国餐厅 — Китайский ресторан</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, "Microsoft YaHei", sans-serif;
+    background: #f7f3ed;
+    color: #343434;
+}
+
+.container { max-width: 1350px; margin: auto; }
+
+/* HEADER */
+.header {
+    background: #8f302b;
+    color: white;
+    border-radius: 18px;
+    padding: 30px 20px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+.header .decoration { font-size: 32px; margin-bottom: 10px; }
+.header h1 { font-size: 38px; margin: 5px 0; letter-spacing: 4px; }
+.header p { color: #f5dcd1; font-size: 14px; letter-spacing: 2px; }
+.header .welcome { margin-top: 15px; font-size: 16px; }
+
+/* СЕТКА НА 2 КОЛОНКИ */
+.layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+.left-col { position: sticky; top: 20px; }
+.right-col {
+    background: #fdfbf7;
+    border-radius: 18px;
+    padding: 20px;
+    border: 1px solid #e8d4b9;
+    box-shadow: 0 4px 12px rgba(100, 50, 20, .05);
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* КАТЕГОРИИ И МЕНЮ */
+.categories { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+.category-btn {
+    border: 1px solid #d9c9bb;
+    background: white;
+    padding: 8px 14px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+}
+.category-btn:hover { background: #f1e4da; }
+.category-btn.active { background: #8f302b; color: white; border-color: #8f302b; }
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.section-heading h2 { margin: 0; font-size: 20px; color: #8f302b; }
+.counter { background: #eadbd0; padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+    max-height: 450px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.food-card {
+    background: white;
+    border: 1px solid #e5ddd5;
+    border-radius: 15px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+.food-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px #00000010;
+    border-color: #d9c9bb;
+}
+
+.food-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.food-cn-wrap { display: flex; align-items: center; gap: 6px; }
+.food-emoji { font-size: 24px; }
+.food-cn { font-size: 22px; font-weight: bold; color: #8f302b; }
+.audio-icon { font-size: 16px; opacity: 0.4; transition: 0.2s; }
+.food-card:hover .audio-icon { opacity: 1; }
+
+.food-pinyin { font-size: 12px; color: #9a8172; }
+.food-ru { font-size: 13px; color: #777; }
+.food-price { font-size: 16px; font-weight: bold; color: #333; }
+
+.quantity { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+.quantity button {
+    width: 30px; height: 30px;
+    border: 1px solid #d9c9bb;
+    background: #fff9f4;
+    border-radius: 9px;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 2;
+}
+.quantity button:hover:not(:disabled) { background: #f0ded1; }
+.quantity button:disabled { opacity: 0.3; cursor: default; }
+.quantity span { font-weight: bold; min-width: 15px; text-align: center; }
+
+/* КОРЗИНА */
+.order-box {
+    background: white;
+    border: 1px solid #e5ddd5;
+    border-radius: 17px;
+    padding: 18px;
+}
+.order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.order-header h2 { margin: 0; color: #8f302b; font-size: 18px; }
+.clear-btn {
+    border: 1px solid #d9c9bb; background: white;
+    border-radius: 9px; padding: 6px 10px; cursor: pointer; font-size: 13px;
+}
+.order-line {
+    display: flex; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px dashed #ddd; font-size: 14px;
+}
+.order-total {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 12px; padding-top: 10px; border-top: 2px solid #eadbd0;
+    font-size: 18px; font-weight: bold;
+}
+.total-price { color: #8f302b; font-size: 22px; }
+.chinese-total { background: #fff5eb; border-radius: 10px; padding: 10px; margin-top: 10px; }
+.chinese-total small { color: #927e70; font-size: 12px; }
+.chinese-total div { font-size: 18px; font-weight: bold; margin-top: 5px; }
+
+.action-btn {
+    background: #8f302b; color: white; border: none;
+    border-radius: 10px; padding: 10px 15px; cursor: pointer;
+    font-size: 14px; margin-top: 12px; width: 100%;
+}
+.action-btn:hover { background: #70231f; }
+.phrase-box {
+    display: none; background: #f8f3ed; padding: 12px;
+    border-radius: 10px; margin-top: 12px; line-height: 1.6; font-size: 14px;
+}
+.phrase-box b { color: #8f302b; }
+
+/* ПРАВАЯ КОЛОНКА */
+.practice-header { text-align: center; margin-bottom: 20px; }
+.practice-header h2 { color: #8e2929; font-size: 24px; margin: 0 0 5px; }
+.practice-header p { color: #856b58; margin: 0; font-size: 14px; }
+
+.tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+.tab-btn {
+    background: white; border: 1px solid #d9c9bb;
+    padding: 10px 20px; border-radius: 25px;
+    cursor: pointer; font-size: 15px; font-weight: bold;
+    color: #923333; transition: 0.2s;
+}
+.tab-btn:hover { background: #f1e4da; }
+.tab-btn.active { background: #9f3030; color: white; border-color: #9f3030; }
+
+.tab-content { display: none; flex: 1; }
+.tab-content.active { display: flex; flex-direction: column; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ШПАРГАЛКА */
+.phrase-cheatsheet {
+    background: #fffaf0;
+    border: 2px solid #e8d4b9;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(100, 50, 20, .08);
+}
+.cheatsheet-title {
+    text-align: center; font-size: 18px; font-weight: bold; color: #9f3030;
+    margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #d8b99a;
+}
+.cheatsheet-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.cheatsheet-col { background: #f8ead9; border-radius: 12px; padding: 15px; }
+.cheatsheet-col.guest { background: #fffdf7; border: 1px solid #e8d4b9; }
+.cheatsheet-role { font-weight: bold; color: #923333; font-size: 15px; margin-bottom: 15px; }
+
+.cheatsheet-item {
+    margin-bottom: 15px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+.cheatsheet-item:hover { background: rgba(255, 255, 255, 0.7); transform: translateX(3px); }
+.cheatsheet-item:active { transform: scale(0.98); }
+
+.cheatsheet-cn { 
+    font-size: 18px; 
+    color: #382b25; 
+    font-weight: bold; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+.cheatsheet-cn .audio-icon { font-size: 14px; opacity: 0.6; }
+
+.cheatsheet-pinyin { font-size: 13px; color: #9a765d; margin-top: 2px; }
+.cheatsheet-ru { font-size: 14px; color: #6f6259; margin-top: 2px; }
+
+/* КАРУСЕЛЬ КАРТОЧЕК */
+.carousel-container { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+.scenario-card {
+    background: #fffaf0;
+    border: 2px solid #e8d4b9;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(100, 50, 20, .1);
+    width: 100%; max-width: 400px; margin-bottom: 20px;
+}
+.scenario-title {
+    background: #9f3030; color: white;
+    padding: 15px 20px; font-size: 18px; font-weight: bold; text-align: center;
+}
+.scenario-body {
+    padding: 25px 20px; background: #fffdf7;
+    min-height: 200px; display: flex; align-items: center; justify-content: center;
+}
+.guest-order { background: #fff1dc; border-radius: 12px; padding: 15px 20px; width: 100%; }
+.guest-order-title { color: #9b3730; font-weight: bold; font-size: 16px; margin-bottom: 12px; text-align: center; }
+.guest-order-list { margin: 0; padding-left: 25px; font-size: 16px; line-height: 1.8; color: #49352a; }
+.guest-order-list li { margin-bottom: 8px; }
+
+.carousel-controls { display: flex; align-items: center; gap: 20px; }
+.nav-btn {
+    background: white; border: 1px solid #d9c9bb; color: #8f302b;
+    padding: 12px 24px; border-radius: 30px; font-size: 16px; font-weight: bold;
+    cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.nav-btn:hover { background: #f8ead9; transform: translateY(-2px); }
+.card-counter { font-weight: bold; color: #9a8172; font-size: 15px; }
+
+/* АДАПТИВНОСТЬ */
+@media (max-width: 950px) {
+    .layout-grid { grid-template-columns: 1fr; }
+    .left-col { position: static; }
+    .menu-grid { max-height: none; grid-template-columns: repeat(3, 1fr); }
+    .right-col { min-height: auto; }
+}
+@media (max-width: 600px) {
+    .menu-grid { grid-template-columns: repeat(2, 1fr); }
+    .cheatsheet-columns { grid-template-columns: 1fr; }
+    .carousel-controls { flex-wrap: wrap; justify-content: center; gap: 10px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- HEADER -->
+<header class="header">
+    <div class="decoration">🥢 🏮 🥢</div>
+    <h1>中国餐厅</h1>
+    <p>ZHŌNGGUÓ CĀNTĪNG · КИТАЙСКИЙ РЕСТОРАН</p>
+    <div class="welcome">欢迎光临！ · Добро пожаловать!</div>
+</header>
+
+<!-- МАКЕТ: 2 КОЛОНКИ -->
+<div class="layout-grid">
+
+    <!-- ЛЕВАЯ КОЛОНКА (МЕНЮ) -->
+    <div class="left-col">
+        <div class="categories" id="categories">
+            <button class="category-btn active" data-cat="all">📖 Всё меню</button>
+            <button class="category-btn" data-cat="drinks">🥤 Напитки</button>
+            <button class="category-btn" data-cat="food">🍜 Блюда</button>
+            <button class="category-btn" data-cat="meat">🥩 Мясо</button>
+            <button class="category-btn" data-cat="veg">🥬 Овощи</button>
+        </div>
+
+        <div class="section-heading">
+            <h2 id="categoryTitle">Наше меню</h2>
+            <span class="counter" id="itemCount">29 позиций</span>
+        </div>
+
+        <div class="menu-grid" id="foodGrid"></div>
+
+        <div class="order-box">
+            <div class="order-header">
+                <h2>🧾 我的订单 · Мой заказ</h2>
+                <button class="clear-btn" id="clear">Очистить</button>
+            </div>
+            <div id="orderLines">Пока ничего не выбрано.</div>
+            <div class="order-total">
+                <span>Итого · 一共</span>
+                <span class="total-price" id="total">¥0</span>
+            </div>
+            <div class="chinese-total">
+                <small>Сумма по-китайски</small>
+                <div id="totalChinese">零元</div>
+                <small>元 yuán — юань</small>
+            </div>
+            <button class="action-btn" id="orderPhrase">Показать фразу для заказа</button>
+            <div class="phrase-box" id="phrase"></div>
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ КОЛОНКА (ПРАКТИКА) -->
+    <div class="right-col">
+        
+        <div class="practice-header">
+            <h2>🍜 点菜练习</h2>
+            <p>Выполняй заказы с помощью меню слева</p>
+        </div>
+
+        <!-- ТАБЫ -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-phrases', this)">📋 Шпаргалка</button>
+            <button class="tab-btn" onclick="switchTab('tab-scenarios', this)">💳 Карточки</button>
+        </div>
+
+        <!-- ВКЛАДКА 1: ШПАРГАЛКА -->
+        <div id="tab-phrases" class="tab-content active">
+            <div class="phrase-cheatsheet">
+                <div class="cheatsheet-title">Базовые реплики</div>
+                <div class="cheatsheet-columns">
+                    <!-- Официант -->
+                    <div class="cheatsheet-col">
+                        <div class="cheatsheet-role">🧑‍🍳 服务员 — Официант</div>
+                        
+                        <div class="cheatsheet-item" onclick="playAudio('jiwei')">
+                            <div class="cheatsheet-cn">几位？ <span class="audio-icon">🔊</span></div>
+                            <div class="cheatsheet-pinyin">Jǐ wèi?</div>
+                            <div class="cheatsheet-ru">Сколько вас человек?</div>
+                        </div>
+                        
+                        <div class="cheatsheet-item" onclick="playAudio('xianzaidiancai')">
+                            <div class="cheatsheet-cn">现在点菜吗？ <span class="audio-icon">🔊</span></div>
+                            <div class="cheatsheet-pinyin">Xiànzài diǎn cài ma?</div>
+                            <div class="cheatsheet-ru">Будете сейчас заказывать?</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Посетитель -->
+                    <div class="cheatsheet-col guest">
+                        <div class="cheatsheet-role">🙋 客人 — Посетитель</div>
+                        
+                        <div class="cheatsheet-item" onclick="playAudio('caidan')">
+                            <div class="cheatsheet-cn">可以给我菜单吗？ <span class="audio-icon">🔊</span></div>
+                            <div class="cheatsheet-pinyin">Kěyǐ gěi wǒ càidān ma?</div>
+                            <div class="cheatsheet-ru">Можно мне меню?</div>
+                        </div>
+                        
+                        <div class="cheatsheet-item" onclick="playAudio('yao')">
+                            <div class="cheatsheet-cn">我要 / 我想点… <span class="audio-icon">🔊</span></div>
+                            <div class="cheatsheet-pinyin">Wǒ yào / Wǒ xiǎng diǎn…</div>
+                            <div class="cheatsheet-ru">Я хочу / Я хочу заказать…</div>
+                        </div>
+
+                        <div class="cheatsheet-item" onclick="playAudio('lama')">
+                            <div class="cheatsheet-cn">这个辣吗？ <span class="audio-icon">🔊</span></div>
+                            <div class="cheatsheet-pinyin">Zhège là ma?</div>
+                            <div class="cheatsheet-ru">Это острое?</div>
+                        </div>
+
+                        <div class="cheatsheet-item" onclick="playAudio('duoshaoqian')">
+                            <div class="cheatsheet-cn">一共多少钱？ <span class="audio-icon">🔊</span></div>
+                            <div class="cheatsheet-pinyin">Yígòng duōshao qián?</div>
+                            <div class="cheatsheet-ru">Сколько всего стоит?</div>
+                        </div>
+
+                        <div class="cheatsheet-item" onclick="playAudio('maidan')">
+                            <div class="cheatsheet-cn">买单！ <span class="audio-icon">🔊</span></div>
+                            <div class="cheatsheet-pinyin">Mǎidān!</div>
+                            <div class="cheatsheet-ru">Счёт, пожалуйста!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВКЛАДКА 2: КАРУСЕЛЬ КАРТОЧЕК -->
+        <div id="tab-scenarios" class="tab-content">
+            <div class="carousel-container">
+                
+                <div class="scenario-card" id="carousel-card">
+                    <div class="scenario-title" id="card-title">Загрузка...</div>
+                    <div class="scenario-body">
+                        <div class="guest-order">
+                            <div class="guest-order-title">我的订单 — Мой заказ</div>
+                            <ul class="guest-order-list" id="card-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-controls">
+                    <button class="nav-btn" onclick="prevCard()">← Назад</button>
+                    <div class="card-counter" id="card-counter">1 / 10</div>
+                    <button class="nav-btn" onclick="nextCard()">Вперед →</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+
+<!-- СКРЫТЫЙ ПЛЕЕР ДЛЯ АУДИО -->
+<audio id="audio-player"></audio>
+
+<script>
+// ==========================================
+// 1. ЛОГИКА АУДИО
+// ==========================================
+const audioPlayer = document.getElementById('audio-player');
+
+function playAudio(audioName) {
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+    audioPlayer.src = `audio/${audioName}.mp3`;
+    audioPlayer.play().catch(error => {
+        console.log(`Аудиофайл не найден: audio/${audioName}.mp3`);
+    });
+}
+
+// ==========================================
+// 2. ПЕРЕКЛЮЧАТЕЛЬ ТАБОВ
+// ==========================================
+function switchTab(tabId, btnElement) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById(tabId).classList.add('active');
+    btnElement.classList.add('active');
+}
+
+// ==========================================
+// 3. КАРУСЕЛЬ КАРТОЧЕК
+// ==========================================
+const scenarios = [
+    { title: "① 一位客人 — Один посетитель", items: ["Чай", "Порция риса", "Порция курицы"] },
+    { title: "② 两位客人 — Два посетителя", items: ["Два молочных чая", "Пельмени", "Салат"] },
+    { title: "③ 一家三口 — Семья из трёх человек", items: ["Три сока", "Рис", "Говядина", "Суп"] },
+    { title: "④ 四个朋友 — Четверо друзей", items: ["Четыре колы", "Пицца", "Две порции картофеля фри", "Жареная курица"] },
+    { title: "⑤ 两位客人 — Два посетителя", items: ["Два кофе", "Два стейка", "Салат"] },
+    { title: "⑥ 三位客人 — Трое посетителей", items: ["Три чая", "Три порции баоцзы", "Лапша", "Две порции огурцов"] },
+    { title: "⑦ 一位客人 — Один посетитель", items: ["Бутылка воды", "Гамбургер", "Картофель фри"] },
+    { title: "⑧ 两位客人 — Два посетителя", items: ["Какао", "Молочный чай", "Пельмени", "Суп"] },
+    { title: "⑨ 一家五口 — Семья из пяти человек", items: ["Три сока", "Два молока", "Две порции риса", "Свинина", "Курица", "Картофель"] },
+    { title: "⑩ 三个朋友 — Трое друзей", items: ["Две колы", "Чай", "Пицца", "Говядина", "Салат"] }
+];
+
+let currentCardIndex = 0;
+
+function renderCard() {
+    const card = scenarios[currentCardIndex];
+    document.getElementById('card-title').textContent = card.title;
+    document.getElementById('card-list').innerHTML = card.items.map(item => `<li>${item}</li>`).join('');
+    document.getElementById('card-counter').textContent = `${currentCardIndex + 1} / ${scenarios.length}`;
+}
+
+function nextCard() {
+    currentCardIndex = (currentCardIndex + 1) % scenarios.length;
+    renderCard();
+}
+
+function prevCard() {
+    currentCardIndex = (currentCardIndex - 1 + scenarios.length) % scenarios.length;
+    renderCard();
+}
+
+renderCard();
+
+// ==========================================
+// 4. ЛОГИКА МЕНЮ
+// ==========================================
+const items = [
+{id:1,cat:'drinks',cn:'水',py:'shuǐ',ru:'Вода',price:3,audio:'shui',emoji:'💧'},
+{id:2,cat:'drinks',cn:'茶',py:'chá',ru:'Чай',price:8,audio:'cha',emoji:'🍵'},
+{id:3,cat:'drinks',cn:'咖啡',py:'kāfēi',ru:'Кофе',price:15,audio:'kafei',emoji:'☕'},
+{id:4,cat:'drinks',cn:'可可',py:'kěkě',ru:'Какао',price:14,audio:'keke',emoji:'🍫'},
+{id:5,cat:'drinks',cn:'可乐',py:'kělè',ru:'Кока-кола',price:8,audio:'kele',emoji:'🥤'},
+{id:6,cat:'drinks',cn:'果汁',py:'guǒzhī',ru:'Сок',price:12,audio:'guozhi',emoji:'🧃'},
+{id:7,cat:'drinks',cn:'牛奶',py:'niúnǎi',ru:'Молоко',price:9,audio:'niunai',emoji:'🥛'},
+{id:8,cat:'drinks',cn:'奶茶',py:'nǎichá',ru:'Молочный чай / бабл-ти',price:16,audio:'naicha',emoji:'🧋'},
+{id:9,cat:'food',cn:'米饭',py:'mǐfàn',ru:'Рис',price:8,audio:'mifan',emoji:'🍚'},
+{id:10,cat:'food',cn:'面条',py:'miàntiáo',ru:'Лапша',price:14,audio:'miantiao',emoji:'🍜'},
+{id:11,cat:'meat',cn:'鸡肉',py:'jīròu',ru:'Курица',price:22,audio:'jirou',emoji:'🍗'},
+{id:12,cat:'meat',cn:'牛肉',py:'niúròu',ru:'Говядина',price:32,audio:'niurou',emoji:'🥩'},
+{id:13,cat:'meat',cn:'羊肉',py:'yángròu',ru:'Баранина',price:36,audio:'yangrou',emoji:'🐑'},
+{id:14,cat:'meat',cn:'猪肉',py:'zhūròu',ru:'Свинина',price:26,audio:'zhurou',emoji:'🥓'},
+{id:15,cat:'food',cn:'汤',py:'tāng',ru:'Суп',price:12,audio:'tang',emoji:'🥣'},
+{id:16,cat:'food',cn:'披萨',py:'pīsà',ru:'Пицца',price:28,audio:'pisa',emoji:'🍕'},
+{id:17,cat:'food',cn:'薯条',py:'shǔtiáo',ru:'Картофель фри',price:15,audio:'shutiao',emoji:'🍟'},
+{id:18,cat:'food',cn:'汉堡',py:'hànbǎo',ru:'Бургер',price:24,audio:'hanbao',emoji:'🍔'},
+{id:19,cat:'food',cn:'包子',py:'bāozi',ru:'Баоцзы',price:16,audio:'baozi',emoji:'🥟'},
+{id:20,cat:'food',cn:'饺子',py:'jiǎozi',ru:'Пельмени',price:20,audio:'jiaozi',emoji:'🥟'},
+{id:21,cat:'food',cn:'沙拉',py:'shālā',ru:'Салат',price:18,audio:'shala',emoji:'🥗'},
+{id:22,cat:'meat',cn:'牛排',py:'niúpái',ru:'Стейк',price:48,audio:'niupai',emoji:'🥩'},
+{id:23,cat:'meat',cn:'炸鸡',py:'zhájī',ru:'Жареная курица',price:25,audio:'zhaji',emoji:'🍗'},
+{id:24,cat:'veg',cn:'胡萝卜',py:'húluóbo',ru:'Морковь',price:6,audio:'huluobo',emoji:'🥕'},
+{id:25,cat:'veg',cn:'西红柿',py:'xīhóngshì',ru:'Помидор',price:7,audio:'xihongshi',emoji:'🍅'},
+{id:26,cat:'veg',cn:'黄瓜',py:'huángguā',ru:'Огурец',price:6,audio:'huanggua',emoji:'🥒'},
+{id:27,cat:'veg',cn:'洋葱',py:'yángcōng',ru:'Лук',price:5,audio:'yangcong',emoji:'🧅'},
+{id:28,cat:'veg',cn:'青椒',py:'qīngjiāo',ru:'Зелёный перец',price:7,audio:'qingjiao',emoji:'🫑'},
+{id:29,cat:'veg',cn:'土豆',py:'tǔdòu',ru:'Картофель',price:6,audio:'tudou',emoji:'🥔'}
+];
+
+const quantities = {};
+let activeCategory = 'all';
+const categoryTitles = {
+    all: 'Наше меню',
+    drinks: '🥤 Напитки · 饮料',
+    food: '🍜 Блюда · 菜',
+    meat: '🥩 Мясо · 肉类',
+    veg: '🥬 Овощи · 蔬菜'
+};
+
+function renderMenu() {
+    const grid = document.getElementById('foodGrid');
+    const shown = items.filter(item => activeCategory === 'all' || item.cat === activeCategory);
+    
+    document.getElementById('categoryTitle').textContent = categoryTitles[activeCategory];
+    document.getElementById('itemCount').textContent = shown.length + ' позиций';
+
+    grid.innerHTML = shown.map(item => `
+        <div class="food-card" onclick="playAudio('${item.audio}')">
+            <div class="food-top">
+                <div class="food-cn-wrap">
+                    <span class="food-emoji">${item.emoji}</span>
+                    <span class="food-cn">${item.cn}</span>
+                </div>
+                <div class="audio-icon">🔊</div>
+            </div>
+            <div class="food-pinyin">${item.py}</div>
+            <div class="food-ru">${item.ru}</div>
+            <div class="food-price">¥${item.price}</div>
+            <div class="quantity" onclick="event.stopPropagation()">
+                <button onclick="changeQuantity(${item.id},-1)" ${!quantities[item.id] ? 'disabled' : ''}>−</button>
+                <span>${quantities[item.id] || 0}</span>
+                <button onclick="changeQuantity(${item.id},1)">+</button>
+            </div>
+        </div>
+    `).join('');
+    updateOrder();
+}
+
+function changeQuantity(id, amount) {
+    quantities[id] = Math.max(0, (quantities[id] || 0) + amount);
+    renderMenu();
+}
+
+function chineseNumber(n) {
+    const digits = ['零','一','二','三','四','五','六','七','八','九'];
+    if (n === 0) return '零';
+    if (n < 10) return digits[n];
+    if (n < 20) return '十' + (n % 10 ? digits[n % 10] : '');
+    if (n < 100) return digits[Math.floor(n/10)] + '十' + (n % 10 ? digits[n % 10] : '');
+    if (n < 1000) {
+        const hundreds = Math.floor(n/100);
+        const rest = n % 100;
+        return digits[hundreds] + '百' + 
+            (rest === 0 ? '' : 
+            rest < 10 ? '零' + digits[rest] : 
+            rest < 20 ? '十' + (rest % 10 ? digits[rest % 10] : '') : 
+            digits[Math.floor(rest/10)] + '十' + (rest % 10 ? digits[rest % 10] : ''));
+    }
+    return String(n);
+}
+
+function updateOrder() {
+    const selected = items.filter(item => quantities[item.id] > 0);
+    const total = selected.reduce((sum,item) => sum + item.price * quantities[item.id], 0);
+    const orderLines = document.getElementById('orderLines');
+
+    if (selected.length === 0) {
+        orderLines.innerHTML = '<p style="color:#999">Пока ничего не выбрано. Выберите блюда из меню.</p>';
+    } else {
+        orderLines.innerHTML = selected.map(item => `
+            <div class="order-line">
+                <span>${item.cn} × ${quantities[item.id]}</span>
+                <b>¥${item.price * quantities[item.id]}</b>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('total').textContent = '¥' + total;
+    document.getElementById('totalChinese').textContent = chineseNumber(total) + '元';
+}
+
+document.querySelectorAll('.category-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        activeCategory = button.dataset.cat;
+        renderMenu();
+    });
+});
+
+document.getElementById('clear').addEventListener('click', () => {
+    Object.keys(quantities).forEach(key => delete quantities[key]);
+    document.getElementById('phrase').style.display = 'none';
+    renderMenu();
+});
+
+document.getElementById('orderPhrase').addEventListener('click', () => {
+    const selected = items.filter(item => quantities[item.id] > 0);
+    const box = document.getElementById('phrase');
+    box.style.display = 'block';
+
+    if (selected.length === 0) {
+        box.innerHTML = 'Сначала выберите хотя бы одно блюдо.';
+        return;
+    }
+
+    const total = selected.reduce((sum,item) => sum + item.price * quantities[item.id], 0);
+
+    box.innerHTML = `
+        <b>我想点这些菜。</b><br>
+        Wǒ xiǎng diǎn zhèxiē cài.<br>
+        Я хочу заказать эти блюда.
+        <br><br>
+        <b>一共${chineseNumber(total)}元。</b><br>
+        Yígòng ${chineseNumber(total)} yuán.<br>
+        Всего ¥${total}.
+    `;
+});
+
+renderMenu();
+</script>
+
+</body>
+</html>
